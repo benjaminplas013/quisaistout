@@ -1596,16 +1596,16 @@ html, body {
 .title-line { display: block; }
 .t1 {
   font-size: clamp(80px, 20vw, 150px);
-  color: #ffffff;
+  color: #ff69b4;
   letter-spacing: -2px;
 }
 .t2 {
   font-size: clamp(58px, 14.5vw, 115px);
-  background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 45%, #7dd3fc 100%);
+  background: linear-gradient(135deg, #ff69b4 0%, #ff1493 45%, #ffb6c1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 0 32px rgba(56,189,248,0.55));
+  filter: drop-shadow(0 0 32px rgba(255,20,147,0.55));
   letter-spacing: -2px;
 }
 
