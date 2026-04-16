@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stats — Modes de jeu</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0d0721;
+      color: #fff;
+      min-height: 100vh;
+      padding: 40px 20px 60px;
+    }
+
+    /* ── En-tête ── */
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    header h1 {
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, #a78bfa, #f472b6, #fb923c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+    header p {
+      margin-top: 8px;
+      color: #94a3b8;
+      font-size: 1rem;
+    }
+
+    /* ── Grille des 3 modes ── */
+    .modes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 28px;
+      max-width: 1100px;
+      margin: 0 auto 52px;
+    }
+
+    .mode-card {
+      border-radius: 20px;
+      padding: 28px 24px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .mode-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      padding: 2px;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+
+    /* Couleurs par mode */
+    .mode-culture  { background: linear-gradient(145deg, #1a0f40, #2d1060); }
+    .mode-culture::before  { background: linear-gradient(135deg, #a78bfa, #7c3aed); }
+
+    .mode-enfants  { background: linear-gradient(145deg, #0f2a1a, #0f3d20); }
+    .mode-enfants::before  { background: linear-gradient(135deg, #4ade80, #16a34a); }
+
+    .mode-duo      { background: linear-gradient(145deg, #2d0f20, #40132a); }
+    .mode-duo::before      { background: linear-gradient(135deg, #f472b6, #be185d); }
+
+    .mode-icon {
+      font-size: 2.8rem;
+      margin-bottom: 10px;
+    }
+    .mode-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .mode-culture  .mode-title { color: #c4b5fd; }
+    .mode-enfants  .mode-title { color: #86efac; }
+    .mode-duo      .mode-title { color: #f9a8d4; }
+
+    .mode-subtitle {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-bottom: 20px;
+    }
+
+    /* Grand compteur */
+    .total-badge {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 6px;
+      border-radius: 50px;
+      padding: 8px 18px;
+      margin-bottom: 22px;
+      font-weight: 800;
+    }
+    .total-badge .num  { font-size: 2.2rem; line-height: 1; }
+    .total-badge .lbl  { font-size: 0.8rem; color: #cbd5e1; font-weight: 500; }
+
+    .mode-culture  .total-badge { background: rgba(139,92,246,.25); color: #c4b5fd; }
+    .mode-enfants  .total-badge { background: rgba(74,222,128,.2);  color: #86efac; }
+    .mode-duo      .total-badge { background: rgba(244,114,182,.2); color: #f9a8d4; }
+
+    /* Barres de catégories */
+    .categories { display: flex; flex-direction: column; gap: 10px; }
+
+    .cat-row { display: flex; flex-direction: column; gap: 4px; }
+    .cat-row-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+    }
+    .cat-name { color: #e2e8f0; }
+    .cat-count { font-weight: 700; font-size: 0.9rem; }
+
+    .bar-track {
+      height: 8px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width .6s ease;
+    }
+    .mode-culture .bar-fill { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+    .mode-enfants .bar-fill { background: linear-gradient(90deg, #16a34a, #4ade80); }
+    .mode-duo     .bar-fill { background: linear-gradient(90deg, #be185d, #f472b6); }
+
+    /* ── Récap global ── */
+    .recap {
+      max-width: 680px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 28px 32px;
+      text-align: center;
+    }
+    .recap h2 {
+      font-size: 1.05rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+    }
+    .recap-nums {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .recap-item .big {
+      font-size: 2.8rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #a78bfa, #f472b6, #fb923c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+    }
+    .recap-item .small {
+      font-size: 0.78rem;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    /* ── Pied de page ── */
+    footer {
+      text-align: center;
+      margin-top: 48px;
+      font-size: 0.75rem;
+      color: #334155;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Modes de jeu — Questions</h1>
+  <p>Récapitulatif de toutes les questions disponibles par mode</p>
+</header>
+
+<div class="modes-grid">
+
+  <!-- ── Mode Culture Générale ── -->
+  <div class="mode-card mode-culture">
+    <div class="mode-icon">🧠</div>
+    <div class="mode-title">Qui sait tout ?</div>
+    <div class="mode-subtitle">Culture générale — adultes</div>
+    <div class="total-badge">
+      <span class="num">200</span>
+      <span class="lbl">questions</span>
+    </div>
+    <div class="categories">
+      <div class="cat-row">
+        <div class="cat-row-top"><span class="cat-name">🌍 Géographie</span><span class="cat-count">20</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-row-top"><span class="cat-name">📜 Histoire</span><span class="cat-count">20</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-row-top"><span class="cat-name">🔬 Science</span><span class="cat-count">20</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-row-top"><span class="cat-name">💻 Tech &amp; Jeux vidéo</span><span class="cat-count">20</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-row-top"><span class="cat-name">🎬 Cinéma &amp; TV</span><span class="cat-count">20</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-row-top"><span class="cat-name">🎵 Musique</span><span class="cat-count">20</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-row-top"><span class="cat-name">⚽ Sport</span><span class="cat-count">20</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-row-top"><span class="cat-name">🐾 Animaux</span><span class="cat-count">20</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-row-top"><span class="cat-name">🍽️ Cuisine</span><span class="cat-count">20</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-row-top"><span class="cat-name">🤔 Insolite</span><span class="cat-count">20</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Mode Enfants ── -->
+  <div class="mode-card mode-enfants">
+    <div class="mode-icon">🌈</div>
+    <div class="mode-title">Questions pour enfants</div>
+    <div class="mode-subtitle">Spécial jeunes joueurs</div>
+    <div class="total-badge">
+      <span class="num">89</span>
+      <span class="lbl">questions</span>
+    </div>
+    <div class="categories">
+      <div class="cat-row">
+        <div class="cat-row-top"><span class="cat-name">⭐ Kids Pop</span><span class="cat-count">22</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-row-top"><span class="cat-name">🌿 Nature</span><span class="cat-count">11</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:50%"></div></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-row-top"><span class="cat-name">🔢 Maths</span><span class="cat-count">10</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:45%"></div></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-row-top"><span class="cat-name">📜 Histoire</span><span class="cat-count">10</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:45%"></div></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-row-top"><span class="cat-name">🐾 Animaux</span><span class="cat-count">10</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:45%"></div></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-row-top"><span class="cat-name">🔬 Science</span><span class="cat-count">9</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:41%"></div></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-row-top"><span class="cat-name">🪄 Magie</span><span class="cat-count">9</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:41%"></div></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-row-top"><span class="cat-name">🍬 Bonbons</span><span class="cat-count">8</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:36%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Mode Duo / Couple ── -->
+  <div class="mode-card mode-duo">
+    <div class="mode-icon">💑</div>
+    <div class="mode-title">Qui se connaît le mieux ?</div>
+    <div class="mode-subtitle">Mode Duo — Vrai / Faux</div>
+    <div class="total-badge">
+      <span class="num">140</span>
+      <span class="lbl">affirmations</span>
+    </div>
+    <div class="categories">
+      <div class="cat-row">
+        <div class="cat-row-top"><span class="cat-name">😋 Goûts &amp; Préférences</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-row-top"><span class="cat-name">🧘 Habitudes &amp; Perso</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:85%"></div></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-row-top"><span class="cat-name">💬 Opinions &amp; Valeurs</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:75%"></div></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-row-top"><span class="cat-name">💼 Vie &amp; Ambitions</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:65%"></div></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-row-top"><span class="cat-name">🌙 Vie quotidienne</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:55%"></div></div>
+      </div>
+    </div>
+    <p style="margin-top:18px; font-size:0.75rem; color:#94a3b8; font-style:italic;">
+      Format Vrai/Faux — chaque joueur répond pour l'autre
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Récap global ── -->
+<div class="recap">
+  <h2>Total disponible</h2>
+  <div class="recap-nums">
+    <div class="recap-item">
+      <div class="big">429</div>
+      <div class="small">questions / affirmations au total</div>
+    </div>
+    <div class="recap-item">
+      <div class="big">3</div>
+      <div class="small">modes de jeu</div>
+    </div>
+    <div class="recap-item">
+      <div class="big">18</div>
+      <div class="small">catégories</div>
+    </div>
+  </div>
+</div>
+
+<footer>App de culture générale — stats générées automatiquement</footer>
+
+</body>
+</html>

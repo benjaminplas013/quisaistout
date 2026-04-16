@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QUI SAIT TOUT ? - Le Jeu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- ÉCRAN 1 : ACCUEIL — PREMIUM                   -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="screen-welcome" class="screen active">
+    <canvas id="particle-canvas"></canvas>
+
+    <div class="live-badge">
+      <span class="live-dot"></span>EN DIRECT
+    </div>
+
+    <div class="welcome-hero">
+      <p class="hero-eyebrow">✦ LE JEU QUI DÉFIE TOUT LE MONDE ✦</p>
+      <h1 class="hero-title">
+        <span class="title-line t1">QUI</span>
+        <span class="title-line t2">SAIT TOUT ?</span>
+      </h1>
+      <p class="hero-typewriter" id="hero-typewriter"></p>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-num" data-target="12847">0</span>
+          <span class="stat-label">parties jouées</span>
+        </div>
+        <div class="stat-divider">·</div>
+        <div class="stat-item">
+          <span class="stat-num" data-target="3">0</span>
+          <span class="stat-label">modes de jeu</span>
+        </div>
+        <div class="stat-divider">·</div>
+        <div class="stat-item">
+          <span class="stat-num" data-target="200">0</span>
+          <span class="stat-label">questions</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mode-grid">
+      <div class="mode-card tilt-card" onclick="showScreen('screen-players')">
+        <div class="card-glow cg-purple"></div>
+        <div class="card-inner">
+          <div class="card-icon">🧠</div>
+          <div class="card-title">Culture Générale</div>
+          <div class="card-desc">Prouve que tu es le plus fort</div>
+          <div class="card-tags-row">
+            <span class="ctag">2-12 joueurs</span>
+            <span class="ctag">200 questions</span>
+          </div>
+        </div>
+        <div class="card-cta">Jouer →</div>
+      </div>
+
+      <div class="mode-card tilt-card mc-featured" onclick="startDuoMode()">
+        <div class="card-glow cg-pink"></div>
+        <div class="featured-pill">❤️ POPULAIRE</div>
+        <div class="card-inner">
+          <div class="card-icon">🫂</div>
+          <div class="card-title">Qui se connaît le mieux ?</div>
+          <div class="card-desc">Le test ultime des duos</div>
+          <div class="card-tags-row">
+            <span class="ctag ct-duo">2 joueurs</span>
+            <span class="ctag ct-duo">Vrai / Faux</span>
+          </div>
+        </div>
+        <div class="card-cta">Jouer →</div>
+      </div>
+
+      <div class="mode-card tilt-card" onclick="startKidsMode()">
+        <div class="card-glow cg-cyan"></div>
+        <div class="card-inner">
+          <div class="card-icon">🧒</div>
+          <div class="card-title">Mode Enfants</div>
+          <div class="card-desc">Questions fun pour les petits</div>
+          <div class="card-tags-row">
+            <span class="ctag ct-kids">2-12 joueurs</span>
+            <span class="ctag ct-kids">Facile</span>
+          </div>
+        </div>
+        <div class="card-cta">Jouer →</div>
+      </div>
+
+      <div class="mode-card tilt-card mc-bomb" onclick="startBombMode()">
+        <div class="card-glow cg-orange"></div>
+        <div class="card-inner">
+          <div class="card-icon bomb-icon-anim">💣</div>
+          <div class="card-title">Mode Bombe</div>
+          <div class="card-desc">Désamorce avant l'explosion !</div>
+          <div class="card-tags-row">
+            <span class="ctag ct-bomb">2-12 joueurs</span>
+            <span class="ctag ct-bomb">⏱️ Chrono</span>
+          </div>
+        </div>
+        <div class="card-cta">Jouer →</div>
+      </div>
+
+      <div class="mode-card tilt-card mc-couple" onclick="startCoupleMode()">
+        <div class="card-glow cg-red"></div>
+        <div class="featured-pill" style="background:linear-gradient(135deg,#f43f5e,#ec4899)">❤️‍🔥 NOUVEAU</div>
+        <div class="card-inner">
+          <div class="card-icon">🔥</div>
+          <div class="card-title">Défis Couple</div>
+          <div class="card-desc">Défis progressifs & personnalisés</div>
+          <div class="card-tags-row">
+            <span class="ctag ct-couple">2 joueurs</span>
+            <span class="ctag ct-couple">Évolutif</span>
+          </div>
+        </div>
+        <div class="card-cta">Découvrir →</div>
+      </div>
+    </div>
+
+    <div class="notif-ticker" id="notif-ticker"></div>
+
+    <!-- Bouton d'aide flottant -->
+    <button class="help-modes-btn" onclick="openModesInfo()" aria-label="Comment jouer ?">
+      <span class="help-modes-icon">?</span>
+      <span class="help-modes-lbl">Comment jouer ?</span>
+    </button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- MODAL : EXPLICATION DES MODES DE JEU           -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="modal-modes-info" class="modes-info-overlay hidden" onclick="closeModeInfo(event)">
+    <div class="modes-info-box">
+      <button class="modes-info-close" onclick="closeModesInfo()">✕</button>
+      <h2 class="modes-info-title">🎮 Les modes de jeu</h2>
+
+      <div class="modes-info-list">
+
+        <div class="minfo-card minfo-culture">
+          <div class="minfo-header">
+            <span class="minfo-icon">🧠</span>
+            <div>
+              <div class="minfo-name">Culture Générale</div>
+              <div class="minfo-tags"><span>2-12 joueurs</span><span>200 questions</span></div>
+            </div>
+          </div>
+          <p class="minfo-desc">Un présentateur lit la question à voix haute. Le candidat choisit son niveau d'aide (réponse directe = 3 pts, 4 choix = 2 pts, 2 choix = 1 pt). Chaque joueur a 3 jokers. Le premier à atteindre le score cible gagne !</p>
+        </div>
+
+        <div class="minfo-card minfo-duo">
+          <div class="minfo-header">
+            <span class="minfo-icon">🫂</span>
+            <div>
+              <div class="minfo-name">Qui se connaît le mieux ?</div>
+              <div class="minfo-tags"><span>2 joueurs</span><span>Vrai / Faux</span></div>
+            </div>
+          </div>
+          <p class="minfo-desc">Joueur 1 répond « Vrai ou Faux » à une affirmation sur lui-même. Joueur 2 doit deviner sa réponse. On marque un point si la prédiction est juste. Puis on inverse les rôles !</p>
+        </div>
+
+        <div class="minfo-card minfo-kids">
+          <div class="minfo-header">
+            <span class="minfo-icon">🧒</span>
+            <div>
+              <div class="minfo-name">Mode Enfants</div>
+              <div class="minfo-tags"><span>2-12 joueurs</span><span>89 questions</span></div>
+            </div>
+          </div>
+          <p class="minfo-desc">Même principe que la culture générale, mais avec des questions adaptées aux enfants : animaux, nature, magie, maths simples… Idéal pour jouer en famille !</p>
+        </div>
+
+        <div class="minfo-card minfo-bomb">
+          <div class="minfo-header">
+            <span class="minfo-icon">💣</span>
+            <div>
+              <div class="minfo-name">Mode Bombe</div>
+              <div class="minfo-tags"><span>2-12 joueurs</span><span>20 secondes</span></div>
+            </div>
+          </div>
+          <p class="minfo-desc">Chaque joueur répond seul à une question QCM en moins de 20 secondes. Une mauvaise réponse ou le temps écoulé = une vie perdue. Le dernier survivant remporte la partie !</p>
+        </div>
+
+        <div class="minfo-card minfo-couple">
+          <div class="minfo-header">
+            <span class="minfo-icon">🔥</span>
+            <div>
+              <div class="minfo-name">Défis Couple</div>
+              <div class="minfo-tags"><span>2 joueurs</span><span>Évolutif</span></div>
+            </div>
+          </div>
+          <p class="minfo-desc">Des défis progressifs personnalisés pour les couples. Choisissez votre niveau de confort (Soft → Hardcore), relevez des défis ensemble, gagnez de l'XP et montez de niveau. Votre progression est sauvegardée via un code unique.</p>
+        </div>
+
+      </div>
+
+      <button class="btn-primary" style="margin-top:8px;width:100%" onclick="closeModesInfo()">C'est parti ! 🚀</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- ÉCRAN 2 : INSCRIPTION DES JOUEURS             -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="screen-players" class="screen">
+    <div class="screen-header">
+      <h2>👥 Les joueurs</h2>
+      <p class="sub">Entre les prénoms des joueurs (2 à 12)</p>
+    </div>
+    <div class="players-form">
+      <div class="player-input-row">
+        <input type="text" id="player-input" placeholder="Prénom du joueur..." maxlength="15" />
+        <button class="btn-add" onclick="addPlayer()">➕</button>
+      </div>
+      <div id="players-list" class="players-list"></div>
+    </div>
+    <div class="screen-footer">
+      <button class="btn-secondary" onclick="showScreen('screen-welcome')">← Retour</button>
+      <button class="btn-primary" id="btn-next-config" onclick="onNextConfig()" disabled>
+        Suivant →
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- ÉCRAN 2b : SÉLECTION DES CATÉGORIES           -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="screen-cat-select" class="screen">
+    <div class="screen-header">
+      <h2>🎯 Choisis tes catégories</h2>
+      <p class="sub">Sélectionne les thèmes que tu veux jouer</p>
+    </div>
+    <div class="cat-grid">
+      <button class="cat-toggle-btn active" data-cat="geo" onclick="toggleCategory('geo', this)">
+        <span class="cat-toggle-emoji">🌍</span>
+        <span class="cat-toggle-name">Géographie</span>
+        <span class="cat-toggle-count">20 questions</span>
+      </button>
+      <button class="cat-toggle-btn active" data-cat="histoire" onclick="toggleCategory('histoire', this)">
+        <span class="cat-toggle-emoji">📜</span>
+        <span class="cat-toggle-name">Histoire</span>
+        <span class="cat-toggle-count">20 questions</span>
+      </button>
+      <button class="cat-toggle-btn active" data-cat="science" onclick="toggleCategory('science', this)">
+        <span class="cat-toggle-emoji">🔬</span>
+        <span class="cat-toggle-name">Science</span>
+        <span class="cat-toggle-count">20 questions</span>
+      </button>
+      <button class="cat-toggle-btn active" data-cat="tech" onclick="toggleCategory('tech', this)">
+        <span class="cat-toggle-emoji">💻</span>
+        <span class="cat-toggle-name">Tech &amp; Jeux vidéo</span>
+        <span class="cat-toggle-count">20 questions</span>
+      </button>
+      <button class="cat-toggle-btn active" data-cat="cinema" onclick="toggleCategory('cinema', this)">
+        <span class="cat-toggle-emoji">🎬</span>
+        <span class="cat-toggle-name">Cinéma &amp; TV</span>
+        <span class="cat-toggle-count">20 questions</span>
+      </button>
+      <button class="cat-toggle-btn active" data-cat="musique" onclick="toggleCategory('musique', this)">
+        <span class="cat-toggle-emoji">🎵</span>
+        <span class="cat-toggle-name">Musique</span>
+        <span class="cat-toggle-count">20 questions</span>
+      </button>
+      <button class="cat-toggle-btn active" data-cat="sport" onclick="toggleCategory('sport', this)">
+        <span class="cat-toggle-emoji">⚽</span>
+        <span class="cat-toggle-name">Sport</span>
+        <span class="cat-toggle-count">20 questions</span>
+      </button>
+      <button class="cat-toggle-btn active" data-cat="animaux" onclick="toggleCategory('animaux', this)">
+        <span class="cat-toggle-emoji">🐾</span>
+        <span class="cat-toggle-name">Animaux</span>
+        <span class="cat-toggle-count">20 questions</span>
+      </button>
+      <button class="cat-toggle-btn active" data-cat="cuisine" onclick="toggleCategory('cuisine', this)">
+        <span class="cat-toggle-emoji">🍽️</span>
+        <span class="cat-toggle-name">Cuisine</span>
+        <span class="cat-toggle-count">20 questions</span>
+      </button>
+      <button class="cat-toggle-btn active" data-cat="insolite" onclick="toggleCategory('insolite', this)">
+        <span class="cat-toggle-emoji">🤔</span>
+        <span class="cat-toggle-name">Insolite</span>
+        <span class="cat-toggle-count">20 questions</span>
+      </button>
+    </div>
+    <button class="btn-toggle-all" id="btn-toggle-all" onclick="toggleAllCategories()">
+      ☑️ Tout déselectionner
+    </button>
+    <div class="screen-footer">
+      <button class="btn-secondary" onclick="showScreen('screen-players')">← Retour</button>
+      <button class="btn-primary" onclick="confirmCategorySelection()">Suivant →</button>
+    </div>
+  </div>
+
+    <!-- ══════════════════════════════════════════════ -->
+  <!-- ÉCRAN 3 : CONFIGURATION                       -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="screen-config" class="screen">
+    <div class="screen-header">
+      <h2>🏆 Objectif de points</h2>
+      <p class="sub">Le premier à atteindre ce score gagne !</p>
+    </div>
+    <div class="score-choices">
+      <button class="score-btn" onclick="selectScore(event, 5)">
+        <span class="score-num">5</span>
+        <span class="score-label">pts</span>
+        <span class="score-desc">Partie rapide</span>
+      </button>
+      <button class="score-btn" onclick="selectScore(event, 10)">
+        <span class="score-num">10</span>
+        <span class="score-label">pts</span>
+        <span class="score-desc">Partie standard</span>
+      </button>
+      <button class="score-btn" onclick="selectScore(event, 15)">
+        <span class="score-num">15</span>
+        <span class="score-label">pts</span>
+        <span class="score-desc">Longue partie</span>
+      </button>
+      <button class="score-btn" onclick="selectScore(event, 20)">
+        <span class="score-num">20</span>
+        <span class="score-label">pts</span>
+        <span class="score-desc">Marathon !</span>
+      </button>
+    </div>
+    <div class="joker-explain">
+      <h3>🃏 Chaque joueur dispose de 3 jokers :</h3>
+      <div class="joker-list">
+        <div class="joker-item">🎲 <strong>Double ou Rien</strong> — Double les points si correct, perd les points si faux</div>
+        <div class="joker-item">⏭️ <strong>Passer</strong> — Change de question sans pénalité</div>
+        <div class="joker-item">📊 <strong>Sondage</strong> — Révèle les % de réponses (mode 4 ou 2 choix)</div>
+      </div>
+    </div>
+    <div class="screen-footer">
+      <button class="btn-secondary" onclick="showScreen('screen-players')">← Retour</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- ÉCRAN 4 : ANNONCE DU TOUR                     -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="screen-turn" class="screen">
+    <div class="turn-content">
+      <div class="turn-badge">🎯</div>
+      <h2>C'est au tour de</h2>
+      <h1 id="turn-player-name" class="player-name-big">???</h1>
+      <div class="turn-instruction">
+        <p>🎤 <strong><span id="turn-presenter-name">???</span></strong> est le présentateur !</p>
+        <p class="small">Il va lire la question à voix haute.</p>
+      </div>
+      <button class="btn-primary big" onclick="showPresenter()">
+        📖 Voir la question (présentateur uniquement)
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- ÉCRAN 5 : VUE PRÉSENTATEUR                    -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="screen-presenter" class="screen">
+    <div class="presenter-header">
+      <span class="presenter-badge">🎤 PRÉSENTATEUR</span>
+      <span id="presenter-name-label" class="presenter-name"></span>
+    </div>
+    <div class="question-card presenter-card">
+      <div id="presenter-category" class="category-badge"></div>
+      <p id="presenter-question" class="question-text"></p>
+      <div class="correct-answer-box">
+        <span class="correct-label">✅ Bonne réponse :</span>
+        <span id="presenter-answer" class="correct-answer-text"></span>
+      </div>
+    </div>
+    <div class="presenter-instruction">
+      <p>📢 Lis la question à voix haute, puis passe l'appareil au candidat !</p>
+    </div>
+    <button class="btn-primary big" onclick="showCandidate()">
+      ➡️ Passer à <span id="presenter-candidate-name"></span>
+    </button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- ÉCRAN 6 : VUE CANDIDAT — CHOIX D'AIDE        -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="screen-candidate" class="screen">
+    <div class="candidate-header">
+      <span class="candidate-badge">🎯 CANDIDAT</span>
+      <span id="candidate-name-label" class="candidate-name"></span>
+    </div>
+    <div class="question-card candidate-card">
+      <div id="candidate-category" class="category-badge"></div>
+      <p id="candidate-question" class="question-text"></p>
+    </div>
+    <div class="help-section">
+      <h3>Choisis ton niveau d'aide :</h3>
+      <div class="help-choices">
+        <button class="help-btn direct" onclick="selectHelp('direct')">
+          <span class="help-icon">🎤</span>
+          <span class="help-title">Réponse directe</span>
+          <span class="help-pts">3 pts</span>
+          <span class="help-desc">Tu réponds à voix haute — aucune aide</span>
+        </button>
+        <button class="help-btn four" onclick="selectHelp('four')">
+          <span class="help-icon">4️⃣</span>
+          <span class="help-title">4 choix</span>
+          <span class="help-pts">2 pts</span>
+          <span class="help-desc">4 réponses à l'écran</span>
+        </button>
+        <button class="help-btn two" onclick="selectHelp('two')">
+          <span class="help-icon">2️⃣</span>
+          <span class="help-title">2 choix</span>
+          <span class="help-pts">1 pt</span>
+          <span class="help-desc">2 réponses à l'écran</span>
+        </button>
+      </div>
+    </div>
+    <div class="joker-section">
+      <h3>🃏 Tes jokers :</h3>
+      <div class="joker-row">
+        <button class="joker-btn" id="joker-double" onclick="useJoker('double')">
+          🎲 Double ou Rien
+        </button>
+        <button class="joker-btn" id="joker-pass" onclick="useJoker('pass')">
+          ⏭️ Passer
+        </button>
+        <button class="joker-btn" id="joker-survey" onclick="useJoker('survey')">
+          📊 Sondage
+        </button>
+      </div>
+      <p id="joker-status" class="joker-status"></p>
+    </div>
+    <div id="double-active-banner" class="double-banner hidden">
+      🎲 DOUBLE OU RIEN ACTIVÉ !
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- ÉCRAN 7 : MODE 4 CHOIX                        -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="screen-four" class="screen">
+    <div class="answer-header">
+      <div id="four-category" class="category-badge"></div>
+      <p id="four-question" class="question-text-small"></p>
+      <div id="double-banner-four" class="double-mini hidden">🎲 Double ou rien !</div>
+    </div>
+    <div id="four-options" class="options-grid four"></div>
+    <div id="survey-results-four" class="survey-bar hidden"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- ÉCRAN 8 : MODE 2 CHOIX                        -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="screen-two" class="screen">
+    <div class="answer-header">
+      <div id="two-category" class="category-badge"></div>
+      <p id="two-question" class="question-text-small"></p>
+      <div id="double-banner-two" class="double-mini hidden">🎲 Double ou rien !</div>
+    </div>
+    <div id="two-options" class="options-grid two"></div>
+    <div id="survey-results-two" class="survey-bar hidden"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- ÉCRAN 9 : MODE DIRECT (PRÉSENTATEUR JUGE)     -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="screen-direct" class="screen">
+    <div class="direct-content">
+      <div class="direct-header">
+        <span class="presenter-badge">🎤 PRÉSENTATEUR — JUGE !</span>
+      </div>
+      <p class="direct-instruction">
+        🎯 <strong><span id="direct-candidate"></span></strong> est en train de répondre à voix haute...
+      </p>
+      <div class="direct-answer-reveal">
+        <p class="reveal-label">La bonne réponse est :</p>
+        <p id="direct-answer" class="direct-answer-text"></p>
+      </div>
+      <div id="double-banner-direct" class="double-mini hidden">🎲 Double ou rien activé !</div>
+      <p class="judge-prompt">Sa réponse est...</p>
+      <div class="judge-buttons">
+        <button class="judge-btn correct" onclick="judgeAnswer(true)">
+          ✅ CORRECTE !
+        </button>
+        <button class="judge-btn wrong" onclick="judgeAnswer(false)">
+          ❌ FAUSSE !
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- ÉCRAN 10 : RÉSULTAT                           -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="screen-result" class="screen">
+    <div class="result-content">
+      <div id="result-icon" class="result-icon"></div>
+      <h2 id="result-title" class="result-title"></h2>
+      <p id="result-correct-answer" class="result-answer"></p>
+      <div id="result-points" class="result-points"></div>
+      <div id="result-fun-fact" class="fun-fact hidden"></div>
+      <button class="btn-primary big" onclick="showScores()">
+        📊 Voir les scores
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- ÉCRAN 11 : TABLEAU DES SCORES                 -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="screen-scores" class="screen">
+    <div class="scores-header">
+      <h2>📊 Classement</h2>
+      <div id="score-target-display" class="target-display"></div>
+    </div>
+    <div id="scores-list" class="scores-list"></div>
+    <button class="btn-primary big" onclick="nextTurn()">
+      ▶️ Tour suivant
+    </button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- ÉCRAN 12 : FIN DE PARTIE                      -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="screen-gameover" class="screen">
+    <div class="gameover-content">
+      <div class="fireworks"></div>
+      <div class="trophy">🏆</div>
+      <h2 class="winner-label">Le grand gagnant est</h2>
+      <h1 id="winner-name" class="winner-name"></h1>
+      <p id="winner-score" class="winner-score"></p>
+      <div id="final-scores" class="final-scores-list"></div>
+      <button class="btn-primary big" onclick="restartGame()">
+        🔄 Nouvelle partie
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- MODE DUO — ÉCRAN 1 : NOMS DES JOUEURS        -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="screen-duo-players" class="screen">
+    <div class="screen-header">
+      <h2>🫂 Qui se connaît le mieux ?</h2>
+      <p class="sub">Entrez vos deux prénoms</p>
+    </div>
+    <div class="duo-players-form">
+      <div class="duo-input-row">
+        <span class="duo-player-label">Joueur 1</span>
+        <input type="text" id="duo-player-1" placeholder="Prénom..." maxlength="15" />
+      </div>
+      <div class="duo-input-row">
+        <span class="duo-player-label">Joueur 2</span>
+        <input type="text" id="duo-player-2" placeholder="Prénom..." maxlength="15" />
+      </div>
+    </div>
+    <div class="screen-footer">
+      <button class="btn-secondary" onclick="showScreen('screen-welcome')">← Retour</button>
+      <button class="btn-primary" onclick="validateDuoPlayers()">Suivant →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- MODE DUO — ÉCRAN 2 : NOMBRE DE QUESTIONS     -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="screen-duo-config" class="screen">
+    <div class="screen-header">
+      <h2>⚙️ Nombre de questions</h2>
+      <p class="sub">Combien de questions voulez-vous jouer ?</p>
+    </div>
+    <div class="score-choices">
+      <button class="score-btn duo-count-btn" onclick="selectDuoCount(event, 10)">
+        <span class="score-num">10</span>
+        <span class="score-label">questions</span>
+        <span class="score-desc">Partie rapide</span>
+      </button>
+      <button class="score-btn duo-count-btn" onclick="selectDuoCount(event, 20)">
+        <span class="score-num">20</span>
+        <span class="score-label">questions</span>
+        <span class="score-desc">Partie normale</span>
+      </button>
+      <button class="score-btn duo-count-btn" onclick="selectDuoCount(event, 30)">
+        <span class="score-num">30</span>
+        <span class="score-label">questions</span>
+        <span class="score-desc">Partie longue</span>
+      </button>
+      <button class="score-btn duo-count-btn" onclick="selectDuoCount(event, 51)">
+        <span class="score-num">51</span>
+        <span class="score-label">questions</span>
+        <span class="score-desc">Tout !</span>
+      </button>
+    </div>
+    <div class="screen-footer">
+      <button class="btn-secondary" onclick="showScreen('screen-duo-players')">← Retour</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- MODE DUO — ÉCRAN 3 : JOUEUR A RÉPOND        -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="screen-duo-self" class="screen">
+    <div class="duo-progress-bar">
+      <span id="duo-progress">Question 1 / 10</span>
+    </div>
+    <div class="duo-turn-header">
+      <p class="duo-guesser-turn">À toi <strong id="duo-self-name"></strong> !</p>
+      <div class="duo-no-peek">⚠️ <span id="duo-guesser-nolook"></span>, ne regarde pas !</div>
+    </div>
+    <div class="duo-question-card">
+      <p class="duo-statement" id="duo-statement"></p>
+    </div>
+    <p class="duo-instruction">Pour toi, c'est VRAI ou FAUX ?</p>
+    <div class="tf-buttons">
+      <button class="tf-btn tf-vrai" onclick="selectSelf('vrai', this)">✅ VRAI</button>
+      <button class="tf-btn tf-faux" onclick="selectSelf('faux', this)">❌ FAUX</button>
+    </div>
+    <button class="btn-primary" id="btn-duo-self-confirm" onclick="confirmSelf()" disabled>OK, à <span id="duo-guesser-confirm-name"></span> maintenant →</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- MODE DUO — ÉCRAN 3b : PASSE LE TÉLÉPHONE    -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="screen-duo-pass" class="screen">
+    <div class="duo-pass-content">
+      <div class="duo-pass-icon">📱</div>
+      <h2 class="duo-pass-title">Passe le téléphone à</h2>
+      <h1 id="duo-pass-name" class="duo-pass-player"></h1>
+      <p class="duo-pass-sub">Ne montre pas ta réponse !</p>
+      <button class="btn-primary big" onclick="showDuoGuess()">
+        Je suis <span id="duo-pass-ready-name"></span>, je suis prêt(e) →
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- MODE DUO — ÉCRAN 4 : JOUEUR B DEVINE        -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="screen-duo-guess" class="screen">
+    <div class="duo-turn-header">
+      <p class="duo-guesser-turn">À toi <strong id="duo-guesser-name"></strong> de deviner !</p>
+      <div class="duo-no-peek">💬 Qu'a répondu <span id="duo-about-name"></span> ?</div>
+    </div>
+    <div class="duo-question-card">
+      <p class="duo-statement" id="duo-guess-statement"></p>
+    </div>
+    <p class="duo-instruction">Selon toi, <span id="duo-about-name-2"></span> a répondu :</p>
+    <div class="tf-buttons">
+      <button class="tf-btn tf-vrai" onclick="selectGuess('vrai', this)">✅ VRAI</button>
+      <button class="tf-btn tf-faux" onclick="selectGuess('faux', this)">❌ FAUX</button>
+    </div>
+    <button class="btn-primary" id="btn-duo-confirm" onclick="confirmGuess()" disabled>Confirmer →</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- MODE DUO — ÉCRAN 5 : RÉSULTAT                -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="screen-duo-result" class="screen">
+    <div class="result-icon" id="duo-result-icon"></div>
+    <h2 class="result-title" id="duo-result-title"></h2>
+    <p class="result-correct-answer" id="duo-result-desc"></p>
+    <div class="duo-scores-mini">
+      <div class="duo-score-item" id="duo-score-p1"></div>
+      <div class="duo-score-item" id="duo-score-p2"></div>
+    </div>
+    <button class="btn-primary big" onclick="nextDuoRound()">Question suivante →</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- MODE DUO — ÉCRAN 6 : FIN DE PARTIE           -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="screen-duo-gameover" class="screen">
+    <div class="gameover-content">
+      <div class="winner-badge">🏆</div>
+      <h2 id="duo-winner-text" class="winner-name"></h2>
+      <p id="duo-winner-subtitle" class="winner-subtitle"></p>
+      <div class="duo-final-scores">
+        <div class="final-score-row" id="duo-final-p1"></div>
+        <div class="final-score-row" id="duo-final-p2"></div>
+      </div>
+      <div class="gameover-buttons">
+        <button class="btn-primary big" onclick="replayDuo()">🔄 Rejouer</button>
+        <button class="btn-secondary" onclick="showScreen('screen-welcome')">🏠 Accueil</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- MODAL DE CONFIRMATION JOKER                   -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="joker-modal" class="modal hidden">
+    <div class="modal-content">
+      <div id="modal-icon" class="modal-icon"></div>
+      <h3 id="modal-title"></h3>
+      <p id="modal-desc"></p>
+      <div class="modal-buttons">
+        <button class="btn-secondary" onclick="closeModal()">Annuler</button>
+        <button class="btn-primary" id="modal-confirm" onclick="confirmJoker()">Utiliser</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- MODE BOMBE — ÉCRAN 1 : CONFIG VIES           -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="screen-bomb-config" class="screen">
+    <div class="screen-header">
+      <h2>💣 Mode Bombe</h2>
+      <p class="sub">Combien de vies pour chaque joueur ?</p>
+    </div>
+    <div class="score-choices">
+      <button class="score-btn bomb-lives-btn" onclick="selectBombLives(event, 1)">
+        <span class="score-num">1</span>
+        <span class="score-label">❤️</span>
+        <span class="score-desc">Mort subite !</span>
+      </button>
+      <button class="score-btn bomb-lives-btn" onclick="selectBombLives(event, 3)">
+        <span class="score-num">3</span>
+        <span class="score-label">❤️❤️❤️</span>
+        <span class="score-desc">Standard</span>
+      </button>
+      <button class="score-btn bomb-lives-btn" onclick="selectBombLives(event, 5)">
+        <span class="score-num">5</span>
+        <span class="score-label">❤️❤️❤️❤️❤️</span>
+        <span class="score-desc">Endurant</span>
+      </button>
+    </div>
+    <div class="bomb-config-info">
+      <p>⏱️ <strong>20 secondes</strong> pour répondre à chaque question</p>
+      <p>💥 Mauvaise réponse ou temps écoulé = une vie en moins</p>
+      <p>💀 Plus de vies = éliminé</p>
+    </div>
+    <div class="screen-footer">
+      <button class="btn-secondary" onclick="showScreen('screen-players')">← Retour</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- MODE BOMBE — ÉCRAN 2 : JEU                    -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="screen-bomb-play" class="screen">
+    <div class="bomb-header">
+      <div class="bomb-player-turn">
+        <span class="bomb-badge">💣 À TOI DE JOUER</span>
+        <span class="bomb-current-name" id="bomb-player-name"></span>
+      </div>
+      <div class="bomb-lives-display" id="bomb-lives-display"></div>
+    </div>
+
+    <div class="bomb-center">
+      <div class="bomb-ring-wrap">
+        <svg class="bomb-ring-svg" viewBox="0 0 120 120">
+          <circle class="bomb-ring-track" cx="60" cy="60" r="52"/>
+          <circle class="bomb-ring-fill" id="bomb-ring-fill" cx="60" cy="60" r="52"/>
+        </svg>
+        <div class="bomb-ring-inner">
+          <div class="bomb-emoji" id="bomb-emoji">💣</div>
+          <div class="bomb-timer-num" id="bomb-timer-num">20</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bomb-question-card">
+      <div id="bomb-category" class="category-badge"></div>
+      <p id="bomb-question" class="question-text-small"></p>
+    </div>
+    <div id="bomb-options" class="options-grid four bomb-options"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- MODE BOMBE — ÉCRAN FIN DE PARTIE             -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="screen-bomb-gameover" class="screen">
+    <div class="gameover-content">
+      <div class="trophy">🏆</div>
+      <h2 class="winner-label">Le survivant !</h2>
+      <h1 id="bomb-winner-name" class="winner-name"></h1>
+      <div id="bomb-final-scores" class="final-scores-list"></div>
+      <div style="display:flex;flex-direction:column;gap:12px;align-items:center;margin-top:16px">
+        <button class="btn-primary big" onclick="restartBombGame()">🔄 Rejouer</button>
+        <button class="btn-secondary" onclick="showScreen('screen-welcome')">🏠 Accueil</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- DÉFIS COUPLE — ÉCRAN 1 : ACCUEIL MODE                   -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div id="screen-couple-home" class="screen">
+    <div class="couple-home-content">
+      <div class="couple-home-icon">❤️‍🔥</div>
+      <h1 class="couple-home-title">Défis Couple<br><span class="couple-home-sub">Évolutif</span></h1>
+      <p class="couple-home-desc">Des défis qui s'adaptent à vous deux, progressent avec vous et renforcent votre complicité.</p>
+      <div class="couple-home-btns">
+        <button class="btn-couple-primary" onclick="coupleHomeNew()">
+          💑 Nouveau couple
+        </button>
+        <button class="btn-couple-secondary" onclick="coupleHomeResume()">
+          🔑 On a déjà un code
+        </button>
+      </div>
+      <button class="btn-secondary" style="margin-top:12px" onclick="showScreen('screen-welcome')">← Retour</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- DÉFIS COUPLE — ÉCRAN 2 : SETUP NOUVEAU COUPLE            -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div id="screen-couple-setup" class="screen">
+    <!-- Étape 1 : Prénoms -->
+    <div id="csetup-step1">
+      <div class="screen-header">
+        <h2>💑 Vos prénoms</h2>
+        <p class="sub">Comment vous appelez-vous ?</p>
+      </div>
+      <div class="csetup-inputs">
+        <div class="csetup-input-row">
+          <span class="csetup-label">Joueur 1</span>
+          <input type="text" id="csetup-p1" placeholder="Prénom…" maxlength="15" />
+        </div>
+        <div class="csetup-input-row">
+          <span class="csetup-label">Joueur 2</span>
+          <input type="text" id="csetup-p2" placeholder="Prénom…" maxlength="15" />
+        </div>
+      </div>
+      <div class="screen-footer">
+        <button class="btn-secondary" onclick="showScreen('screen-couple-home')">← Retour</button>
+        <button class="btn-primary" onclick="cSetupNext1()">Suivant →</button>
+      </div>
+    </div>
+
+    <!-- Étape 2 : Niveau de confort -->
+    <div id="csetup-step2" class="hidden">
+      <div class="screen-header">
+        <h2>🌡️ Niveau de confort</h2>
+        <p class="sub">Jusqu'où voulez-vous aller ?</p>
+      </div>
+      <div class="comfort-grid">
+        <button class="comfort-btn comfort-soft" onclick="cSelectComfort('soft', this)">
+          <span class="comfort-emoji">🌸</span>
+          <span class="comfort-name">Soft</span>
+          <span class="comfort-desc">Romantique & doux</span>
+          <span class="comfort-stars">★★☆☆☆</span>
+        </button>
+        <button class="comfort-btn comfort-fun" onclick="cSelectComfort('fun', this)">
+          <span class="comfort-emoji">😄</span>
+          <span class="comfort-name">Fun</span>
+          <span class="comfort-desc">Joueur & légèrement flirty</span>
+          <span class="comfort-stars">★★★☆☆</span>
+        </button>
+        <button class="comfort-btn comfort-hot" onclick="cSelectComfort('hot', this)">
+          <span class="comfort-emoji">🔥</span>
+          <span class="comfort-name">Hot</span>
+          <span class="comfort-desc">Intense & désirable</span>
+          <span class="comfort-stars">★★★★☆</span>
+        </button>
+        <button class="comfort-btn comfort-hardcore" onclick="cSelectComfort('hardcore', this)">
+          <span class="comfort-emoji">💀</span>
+          <span class="comfort-name">Hardcore</span>
+          <span class="comfort-desc">Sans limites (ou presque)</span>
+          <span class="comfort-stars">★★★★★</span>
+        </button>
+      </div>
+      <div class="screen-footer">
+        <button class="btn-secondary" onclick="document.getElementById('csetup-step2').classList.add('hidden');document.getElementById('csetup-step1').classList.remove('hidden')">← Retour</button>
+        <button class="btn-primary" onclick="cSetupNext2()">Créer le couple →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- DÉFIS COUPLE — ÉCRAN 3 : REPRENDRE AVEC CODE             -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div id="screen-couple-resume" class="screen">
+    <div class="screen-header">
+      <h2>🔑 Votre code couple</h2>
+      <p class="sub">Entrez votre code à 6 caractères</p>
+    </div>
+    <div class="cresume-form">
+      <input type="text" id="cresume-input" placeholder="EX : ABC123" maxlength="6"
+        style="text-align:center;font-size:28px;font-weight:900;letter-spacing:6px;text-transform:uppercase"
+        oninput="this.value=this.value.toUpperCase()" />
+      <p id="cresume-error" class="cresume-error"></p>
+    </div>
+    <div class="screen-footer">
+      <button class="btn-secondary" onclick="showScreen('screen-couple-home')">← Retour</button>
+      <button class="btn-primary" onclick="coupleResumeSubmit()">Reprendre →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- DÉFIS COUPLE — ÉCRAN 4 : DASHBOARD                       -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div id="screen-couple-dashboard" class="screen">
+    <div class="cdash-container">
+      <div class="cdash-header">
+        <h2 class="cdash-names" id="cdash-names">… & …</h2>
+        <div class="cdash-level-badge" id="cdash-level-badge">✨ Niv. 1</div>
+      </div>
+
+      <div class="cdash-xp-block">
+        <div class="cdash-xp-track">
+          <div class="cdash-xp-bar" id="cdash-xp-bar" style="width:0%"></div>
+        </div>
+        <p class="cdash-xp-text" id="cdash-xp-text">0 / 150 XP</p>
+      </div>
+
+      <div class="cdash-stats-row">
+        <div class="cdash-stat">
+          <span id="cdash-streak" class="cdash-stat-big">🔥 0 jour</span>
+        </div>
+        <div class="cdash-stat">
+          <span class="cdash-stat-lbl">✅</span>
+          <span id="cdash-stat-done" class="cdash-stat-num">0</span>
+          <span class="cdash-stat-lbl">complétés</span>
+        </div>
+        <div class="cdash-stat">
+          <span class="cdash-stat-lbl">⏭️</span>
+          <span id="cdash-stat-skip" class="cdash-stat-num">0</span>
+          <span class="cdash-stat-lbl">passés</span>
+        </div>
+        <div class="cdash-stat">
+          <span class="cdash-stat-lbl">🎯</span>
+          <span id="cdash-stat-total" class="cdash-stat-num">0</span>
+          <span class="cdash-stat-lbl">total</span>
+        </div>
+      </div>
+
+      <div class="cdash-meta-row">
+        <span class="cdash-comfort" id="cdash-comfort"></span>
+        <span class="cdash-code-row" onclick="copyCoupleCode()">
+          Code : <strong id="cdash-code">------</strong> 📋
+        </span>
+      </div>
+
+      <div class="cdash-actions">
+        <button class="btn-couple-primary big" onclick="openCouplePack()">
+          📦 Nouveau Pack
+        </button>
+        <button class="btn-couple-secondary" onclick="openConfessionMode()">
+          💌 Mode Confession
+        </button>
+        <button class="btn-secondary" onclick="showScreen('screen-welcome')">
+          🏠 Accueil
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- DÉFIS COUPLE — ÉCRAN 5 : PACK                            -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div id="screen-couple-pack" class="screen">
+    <div class="cpack-container">
+      <div class="cpack-header">
+        <h2>📦 Votre pack du moment</h2>
+        <p class="sub">3 expériences à vivre ensemble</p>
+      </div>
+      <div id="cpack-items" class="cpack-items"></div>
+      <button id="cpack-newpack-btn" class="btn-couple-primary" style="display:none;margin-top:8px" onclick="cPackNewPack();renderCouplePack()">
+        🆕 Nouveau pack
+      </button>
+      <button class="btn-secondary" style="margin-top:12px" onclick="showCoupleDashboard()">← Dashboard</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- DÉFIS COUPLE — ÉCRAN 6 : DÉTAIL D'UN DÉFI               -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div id="screen-couple-challenge" class="screen">
+    <div class="cchallenge-container">
+      <div class="cchallenge-header">
+        <span id="cchallenge-type-icon" class="cchallenge-big-icon">🧍</span>
+        <div>
+          <div class="cchallenge-type-label" id="cchallenge-type-label">Défi Solo</div>
+          <div class="cchallenge-cat" id="cchallenge-cat">💗 Romantique</div>
+        </div>
+      </div>
+      <div class="cchallenge-stars" id="cchallenge-stars">★★★☆☆</div>
+      <div class="cchallenge-card">
+        <div class="cchallenge-emoji" id="cchallenge-emoji">💌</div>
+        <p class="cchallenge-desc" id="cchallenge-desc"></p>
+      </div>
+      <div id="cchallenge-actions" class="cchallenge-actions"></div>
+      <button class="btn-secondary" style="margin-top:14px" onclick="renderCouplePack();showScreen('screen-couple-pack')">← Retour</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- DÉFIS COUPLE — ÉCRAN 7 : RÉSULTAT DÉFI                   -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div id="screen-couple-result" class="screen">
+    <div class="cresult-container">
+      <div class="cresult-icon" id="cresult-icon">🎉</div>
+      <h2 class="cresult-title" id="cresult-title">Super !</h2>
+
+      <div id="cresult-levelup" class="cresult-levelup hidden"></div>
+
+      <div class="cresult-xp-block">
+        <div class="cresult-level" id="cresult-level"></div>
+        <div class="cdash-xp-track">
+          <div class="cdash-xp-bar" id="cresult-xp-bar" style="width:0%"></div>
+        </div>
+        <p class="cdash-xp-text" id="cresult-xp-label"></p>
+      </div>
+
+      <div class="cresult-btns">
+        <button class="btn-couple-primary" id="cresult-back-pack">📦 Retour au pack</button>
+        <button class="btn-secondary" onclick="showCoupleDashboard()">📊 Dashboard</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- DÉFIS COUPLE — ÉCRAN 8 : MODE CONFESSION                 -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div id="screen-confession" class="screen">
+    <div class="conf-container">
+      <div class="conf-header">
+        <h2>💌 Confessions</h2>
+        <p class="sub">Un espace doux & discret pour dire ce qu'on n'ose pas</p>
+      </div>
+
+      <div class="conf-write-block">
+        <div class="conf-who-row">
+          <span class="conf-who-lbl">C'est :</span>
+          <button class="conf-who-btn" id="conf-who-p1" onclick="confSelectWho('p1',this)">…</button>
+          <button class="conf-who-btn" id="conf-who-p2" onclick="confSelectWho('p2',this)">…</button>
+        </div>
+        <textarea id="conf-textarea" class="conf-textarea" placeholder="Écris ton envie, ta pensée, ton fantasme… Pas de jugement ici. 💌" maxlength="300"></textarea>
+        <div style="display:flex;justify-content:flex-end">
+          <button class="btn-couple-primary" style="font-size:14px;padding:10px 24px" onclick="confSend()">Envoyer 💌</button>
+        </div>
+      </div>
+
+      <div id="conf-list" class="conf-list"></div>
+
+      <button class="btn-secondary" style="margin-top:16px" onclick="showCoupleDashboard()">← Dashboard</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- MODAL VÉRIFICATION ÂGE 18+                               -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div id="modal-age" class="modal-age-overlay hidden">
+    <div class="modal-age-box">
+      <div class="modal-age-icon">🔞</div>
+      <h2 class="modal-age-title">Contenu réservé aux adultes</h2>
+      <p class="modal-age-desc">Le mode <strong>Défis Couple</strong> contient des défis et questions réservés aux personnes majeures.<br><br>Confirmez-vous avoir <strong>18 ans ou plus</strong> ?</p>
+      <div class="modal-age-buttons">
+        <button class="btn-secondary" onclick="ageDeny()">❌ Non, j'ai moins de 18 ans</button>
+        <button class="btn-age-confirm" onclick="ageConfirm()">✅ Oui, j'ai 18 ans ou plus</button>
+      </div>
+      <p class="modal-age-legal">⚠️ En confirmant, vous certifiez être majeur(e). Ce mode est interdit aux mineurs.</p>
+    </div>
+  </div>
+
+  <script src="questions.js"></script>
+  <script src="questions-duo.js"></script>
+  <script src="questions-kids.js"></script>
+  <script src="challenges-couple.js"></script>
+  <script src="script.js"></script>
+  <script src="couple.js"></script>
+</body>
+</html>
