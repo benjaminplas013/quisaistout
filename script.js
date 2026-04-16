@@ -201,7 +201,7 @@ function showDirectMode() {
   document.getElementById('direct-candidate').textContent = player.name;
   document.getElementById('direct-answer').textContent = q.a;
 
-  toggleDoubleBanner('direct-banner-direct');
+  toggleDoubleBanner('double-banner-direct');
   showScreen('screen-direct');
 }
 
@@ -946,8 +946,8 @@ function confirmCategorySelection() {
 
   const SYMBOLS = ['?', '✦', '★', '◆', '✿'];
   const COLORS  = [
-    'rgba(167,139,250,', 'rgba(236,72,153,',
-    'rgba(6,182,212,',   'rgba(251,191,36,',
+    'rgba(56,189,248,',  'rgba(14,165,233,',
+    'rgba(6,182,212,',   'rgba(125,211,252,',
   ];
 
   const particles = Array.from({ length: 52 }, () => ({
