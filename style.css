@@ -274,6 +274,8 @@ html, body {
   justify-content: flex-start;
   padding-top: 20px;
   padding-bottom: 40px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .screen.active {
