@@ -270,6 +270,12 @@ html, body {
   transition: opacity 0.4s ease, transform 0.4s ease;
   z-index: 1;
 }
+#screen-welcome {
+  justify-content: flex-start;
+  padding-top: 20px;
+  padding-bottom: 40px;
+}
+
 .screen.active {
   opacity: 1;
   pointer-events: all;
