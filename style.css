@@ -251,7 +251,7 @@ html, body {
   background: linear-gradient(135deg, #020b18 0%, #041428 50%, #072040 100%);
   background-attachment: fixed;
   color: var(--white);
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 /* ── Screens ── */
@@ -274,8 +274,9 @@ html, body {
   justify-content: flex-start;
   padding-top: 20px;
   padding-bottom: 40px;
-  overflow-y: auto;
+  overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 .screen.active {
